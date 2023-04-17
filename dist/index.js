@@ -7,6 +7,7 @@ const btn = document.getElementById("btn");
 // ts 타입은 그냥 HTMLElement (input 인지 btn 인지 그런거 모름)
 const input = document.getElementById("todoinput");
 const form = document.querySelector("form");
+const list = document.getElementById("todolist");
 //이렇게 할수도 있지만... 함수를 분리한다면?
 // form.addEventListener("submit", (e) => {
 //   //우리가 그냥 막쓰던 e 는 사실 submitEvent였다...
@@ -15,11 +16,40 @@ const form = document.querySelector("form");
 // });
 const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
+    const newTodo = {
+        text: input.value,
+        completed: false,
+    };
+    createTodo(newTodo);
+    todos.push(newTodo);
+    localStorage.setItem("todos", JSON.stringify(todos));
+    input.value = "";
+};
+const createTodo = (todo) => {
+    const newLi = document.createElement("li");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = todo.completed;
+    checkbox.addEventListener("change", (e) => {
+        console.log("click!!");
+        todo.completed = checkbox.checked;
+        saveTodos();
+    });
+    newLi.append(todo.text);
+    newLi.append(checkbox);
+    list.append(newLi);
 };
 form.addEventListener("submit", handleSubmit);
 //DOM에 내장되어있는 타입을 확인할 수 있다.
 // 기본적으로 TS는 DOM의 모든 타입 정의를 자동으로 인지함.
-btn === null || btn === void 0 ? void 0 : btn.addEventListener("click", () => {
-    input.value;
-});
+const readTodos = () => {
+    const todosJson = localStorage.getItem("todos");
+    if (todosJson === null)
+        return [];
+    return JSON.parse(todosJson);
+};
+const todos = readTodos();
+todos.forEach(createTodo);
+const saveTodos = () => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+};
